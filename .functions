@@ -1,3 +1,13 @@
+# Global PIP
+function syspip() {
+	PIP_REQUIRE_VIRTUALENV="" pip "$@"
+}
+
+# Control Postrges Server
+function postgres() {
+	pg_Ctl "$@" -D $PGDATA -l $PGDATA/server.log -m immediate
+}
+
 # Simple calculator
 function calc() {
 	local result=""

@@ -1,3 +1,6 @@
+# Set architecture flags
+export ARCHFLAGS="-arch x86_64"
+
 # Make vim the default editor
 export EDITOR="vim"
 
@@ -23,3 +26,15 @@ export GREP_OPTIONS="--color=auto"
 
 # Link Homebrew casks in `/Applications` rather than `~/Applications`
 export HOMEBREW_CASK_OPTS="--appdir=/Applications"
+
+# PIP should only run if a virtualenv is activated
+export PIP_REQUIRE_VIRTUALENV=true
+
+# Cache pip-installed packages
+export PIP_DOWNLOAD_CACHE=$HOME/.pip/cache
+
+# Data folder for Postgres
+export PGDATA=/usr/local/var/postgres
+
+# Default workon directory
+export WORKON_HOME=$HOME/.virtualenvs
