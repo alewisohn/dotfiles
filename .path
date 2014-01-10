@@ -1,2 +1,5 @@
 # Ensure user installed binaries take precedence
-export PATH=/usr/local/bin:/usr/local/share/python:$PATH
+export PATH=/usr/local/bin:$PATH
+
+# Project home directory for by virtualenvwrapper
+export PROJECT_HOME=~/Workspace
