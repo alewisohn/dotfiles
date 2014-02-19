@@ -25,7 +25,7 @@ export MANPAGER="less -X"
 export GREP_OPTIONS="--color=auto"
 
 # Link Homebrew casks in `/Applications` rather than `~/Applications`
-export HOMEBREW_CASK_OPTS="--appdir=/Applications"
+export HOMEBREW_CASK_OPTS="--appdir=~/Applications"
 
 # PIP should only run if a virtualenv is activated
 export PIP_REQUIRE_VIRTUALENV=true
