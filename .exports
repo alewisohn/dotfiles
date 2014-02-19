@@ -38,3 +38,6 @@ export PGDATA=/usr/local/var/postgres
 
 # Default workon directory
 export WORKON_HOME=$HOME/.virtualenvs
+
+# Project home directory user by virtualenvwrapper
+export PROJECT_HOME=$HOME/Workspace
