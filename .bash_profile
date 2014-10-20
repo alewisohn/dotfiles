@@ -40,3 +40,6 @@ complete -o "nospace" -W "Contacts Calendar Dock Finder Mail Safari iTunes Syste
 
 # Load virtualenvwrapper commands
 source /usr/local/bin/virtualenvwrapper.sh
+
+# Initialize rbenv
+eval "$(rbenv init -)"

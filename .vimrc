@@ -37,9 +37,7 @@ set number
 " Enable syntax highlighting
 syntax on
 " Highlight current line
-set cursorline
-" Make tabs as wide as two spaces
-set tabstop=2
+"set cursorline
 " Show “invisible” characters
 set lcs=tab:▸\ ,trail:·,eol:¬,nbsp:_
 set list
@@ -68,12 +66,14 @@ set title
 " Show the (partial) command as it’s being typed
 set showcmd
 " Use relative line numbers
-if exists("&relativenumber")
-	set relativenumber
-	au BufReadPost * set relativenumber
-endif
+"if exists("&relativenumber")
+"	set relativenumber
+"	au BufReadPost * set relativenumber
+"endif
 " Start scrolling three lines before the horizontal window border
 set scrolloff=3
+" Convert tabs to spaces
+set tabstop=4 shiftwidth=4 expandtab
 
 " Strip trailing whitespace (,ss)
 function! StripWhitespace()

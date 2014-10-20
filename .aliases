@@ -150,3 +150,8 @@ command -v npm > /dev/null && alias npme="npm --registry http://registry.npmjs.e
 
 # Easier access for the updatedb command
 alias updatedb="sudo /usr/libexec/locate.updatedb"
+
+# Concat all ssh configs into one master config
+alias sshconfig='> ~/.ssh/config && for f in ~/.ssh/configs/*; do echo "# generated from $f" >> ~/.ssh/config && grep -hv ^# $f >> ~/.ssh/config; done'
+
+alias sshemallletgodsortemout="awsssh > ~/.ssh/configs/awsssh && sshconfig"
