@@ -1,23 +1,40 @@
-call pathogen#infect()
-
-" Disable compatibility with vi
-set nocompatible
-
-" Turn on syntax highlighting
-syntax on
-
-" Indent Rules
-filetype plugin indent on
-
-set smartindent
-
+" Use the Solarized Dark theme
 set background=dark
-colorscheme Vividchalk
+colorscheme solarized
+let g:solarized_termtrans=1
 
-" Automatically reload file when changed outside of buffer
-set autoread
+" Make Vim more useful
+set nocompatible
+" Use the OS clipboard by default (on versions compiled with `+clipboard`)
+set clipboard=unnamed
+" Enhance command-line completion
+set wildmenu
+" Allow cursor keys in insert mode
+set esckeys
+" Allow backspace in insert mode
+set backspace=indent,eol,start
+" Optimize for fast terminal connections
+set ttyfast
+" Add the g flag to search/replace by default
+set gdefault
+" Use UTF-8 without BOM
+set encoding=utf-8 nobomb
+" Change mapleader
+let mapleader=","
+" Don’t add empty newlines at the end of files
+set binary
+set noeol
+" Centralize backups, swapfiles and undo history
+set backupdir=~/.vim/backups
+set directory=~/.vim/swaps
+if exists("&undodir")
+	set undodir=~/.vim/undo
+endif
 
-" Turn on modelines
+" Don’t create backups when editing files in certain directories
+set backupskip=/tmp/*,/private/tmp/*
+
+" Respect modeline in files
 set modeline
 set modelines=3
 
@@ -185,66 +202,38 @@ set t_Co=256
 
 " Remove some of the more annoying 'Press ENTER to continue' messages
 set shortmess=atI
+" Show the current mode
+set showmode
+" Show the filename in the window titlebar
+set title
+" Show the (partial) command as it’s being typed
+set showcmd
+" Use relative line numbers
+if exists("&relativenumber")
+	set relativenumber
+	au BufReadPost * set relativenumber
+endif
+" Start scrolling three lines before the horizontal window border
+set scrolloff=3
 
-" Automatically reload vimrc when save
-autocmd! BufWritePost .vimrc source %
-autocmd! BufWritePost .gvimrc source %
+" Strip trailing whitespace (,ss)
+function! StripWhitespace()
+	let save_cursor = getpos(".")
+	let old_query = getreg('/')
+	:%s/\s\+$//e
+	call setpos('.', save_cursor)
+	call setreg('/', old_query)
+endfunction
+noremap <leader>ss :call StripWhitespace()<CR>
+" Save a file as root (,W)
+noremap <leader>W :w !sudo tee % > /dev/null<CR>
 
-" Remember cursor position on files
-autocmd BufReadPost * normal `"
-
-" I don't need help dammit
-inoremap <F1> <ESC>
-nnoremap <F1> <ESC>
-vnoremap <F1> <ESC>
-
-" In vim, C-c closes insert mode but doesnt trigger the events that ESC does
-" but ESC is so farrrrrrrrrrrrrrrrrrrr away. So important
-inoremap <C-c> <ESC>
-
-" I'm not quick enough when releasing shift
-command! W w
-
-" autocomplete on dashed-words, very useful for css
-set iskeyword+=-
-
-" Don't flicker when executing macros/functions
-set lazyredraw
-
-" Show syntax highlighting groups for word under cursor
-nmap <C-S-P> :call <SID>SynStack()<CR>
-function! <SID>SynStack()
-  if !exists("*synstack")
-    return
-  endif
-  echo map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")')
-endfunc
-
-" Rainbow parenthesis
-au VimEnter * RainbowParenthesesToggle
-au Syntax * RainbowParenthesesLoadRound
-au Syntax * RainbowParenthesesLoadSquare
-au Syntax * RainbowParenthesesLoadBraces
-
-" Compile coffeescript files on write
-au BufWritePost *.coffee silent CoffeeMake! -b | cwindow | redraw
-
-" I can't let go of the shift key fast enough :(
-cnoreabbrev Q q
-cnoreabbrev Qa qa
-cnoreabbrev Qal qa
-cnoreabbrev Qall qa
-cnoreabbrev W w
-cnoreabbrev Wa wa
-cnoreabbrev Wal wa
-cnoreabbrev Wall wa
-cnoreabbrev Set set
-
-" json-vim
-let g:vim_json_syntax_conceal = 0
-
-" Syntastic
-" Check syntax on open
-let g:syntastic_check_on_open=1
-" Populate the error window
-let g:syntastic_always_populate_loc_list = 1
+" Automatic commands
+if has("autocmd")
+	" Enable file type detection
+	filetype on
+	" Treat .json files as .js
+	autocmd BufNewFile,BufRead *.json setfiletype json syntax=javascript
+	" Treat .md files as Markdown
+	autocmd BufNewFile,BufRead *.md setlocal filetype=markdown
+endif
