@@ -1,5 +1,19 @@
 [alias]
-	# View abbreviated SHA, description, and history graph of the latest 20 commits
+    branches = branch -a
+    remotes = remote
+    tags = tag -l
+    stashes = stash list
+    unstage = reset -q HEAD --
+    discard = checkout --
+    uncommit = reset --mixed HEAD~
+    amend = commit --amend
+    # View a timeline of commits
+    graph = log --graph -10 --branches --remotes --tags  --format=format:'%Cgreen%h %Creset• %<(75,trunc)%s (%cN, %cr) %Cred%d' --date-order
+    # View what's different
+    precommit = diff --cached --diff-algorithm=minimal -w
+    # View what I committed in the last week
+    week = log --no-merges --author='Andrew Lewisohn' --pretty=format:'%Cgreen%ad%Creset : %s' --color --reverse --since='1 week ago' --date=short
+    # View abbreviated SHA, description, and history graph of the latest 20 commits
 	l = log --pretty=oneline -n 20 --graph --abbrev-commit
 	# View the current working tree status using the short format
 	s = status -s
@@ -15,10 +29,6 @@
 	ca = !git add -A && git commit -av
 	# Switch to a branch, creating it if necessary
 	go = checkout -B
-	# Show verbose output about tags, branches or remotes
-	tags = tag -l
-	branches = branch -a
-	remotes = remote -v
 	# Credit an author on the latest commit
 	credit = "!f() { git commit --amend --author \"$1 <$2>\" -C HEAD; }; f"
 	# Interactive rebase with the given number of latest commits
@@ -96,3 +106,6 @@
 [mergetool "sourcetree"]
 	cmd = /opt/homebrew-cask/Caskroom/sourcetree/1.8.1/SourceTree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
 	trustExitCode = true
+[user]
+	email = alewisohn@gmail.com
+	name = Andrew Lewisohn

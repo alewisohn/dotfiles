@@ -16,7 +16,13 @@ export LANG="en_US"
 export LC_ALL="en_US.UTF-8"
 
 # Highlight section titles in manual pages
-export LESS_TERMCAP_md="$ORANGE"
+export LESS_TERMCAP_mb=$'\E[01;31m'
+export LESS_TERMCAP_md=$'\E[01;34m'
+export LESS_TERMCAP_me=$'\E[0m'
+export LESS_TERMCAP_se=$'\E[0m'
+export LESS_TERMCAP_so=$'\E[01;44;33m'
+export LESS_TERMCAP_ue=$'\E[0m'
+export LESS_TERMCAP_us=$'\E[01;32m'
 
 # Don’t clear the screen after quitting a manual page
 export MANPAGER="less -X"
@@ -27,11 +33,14 @@ export GREP_OPTIONS="--color=auto"
 # Link Homebrew casks in `/Applications` rather than `~/Applications`
 export HOMEBREW_CASK_OPTS="--appdir=~/Applications"
 
+# Set nvm home directory
+export NVM_DIR=~/.nvm
+
 # PIP should only run if a virtualenv is activated
-export PIP_REQUIRE_VIRTUALENV=true
+#export PIP_REQUIRE_VIRTUALENV=true
 
 # Cache pip-installed packages
-export PIP_DOWNLOAD_CACHE=$HOME/.pip/cache
+#export PIP_DOWNLOAD_CACHE=$HOME/.pip/cache
 
 # Data folder for Postgres
 export PGDATA=/usr/local/var/postgres
@@ -42,7 +51,12 @@ export WORKON_HOME=$HOME/.virtualenvs
 # Project home directory user by virtualenvwrapper
 export PROJECT_HOME=$HOME/Workspace
 
-# set up amazon web services credentials
+# Setup vcprompt format
+export VCPROMPT_FORMAT="%b%u%m"
+
+# Setup pyenv
+export PYENV_ROOT=/usr/local/var/pyenv
+
 # set up amazon web services credentials when using multiple profiles
 export AWS_PROFILE=${AWS_PROFILE:-beatport}
 export AWS_CONFIG_FILE="${HOME}/.aws/config"
@@ -52,3 +66,4 @@ if [[ -f $AWS_CONFIG_FILE ]]; then
   export AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY"
   export AWS_SECRET_ACCESS_KEY="$AWS_SECRET_KEY"
 fi
+
