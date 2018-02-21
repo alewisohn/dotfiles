@@ -39,3 +39,10 @@ export LESS_TERMCAP_md="${yellow}";
 
 # Don’t clear the screen after quitting a manual page.
 export MANPAGER='less -X';
+
+# Export Homebrew token
+export HOMEBREW_GITHUB_API_TOKEN=37b0fa0ac84b1d252cd2bd18b0d83a9ed8ebc1c8
+
+# Export NVM Home Dir
+export NVM_DIR="$HOME/.nvm"
+

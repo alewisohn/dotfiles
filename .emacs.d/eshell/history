@@ -1,0 +1,13 @@
+echo $PATH
+clear
+logout
+exit
+workon sitterfied
+cd ..
+cd ..
+ls al
+ls -al
+vagrant ssh
+clear
+exit
+exit
