@@ -1,0 +1,21 @@
+{
+  "black_and_white_icons": false, 
+  "hide_toolbar_duration": true, 
+  "http_proxy": "", 
+  "last_connect": {
+    "host": "vpn.sitterfied.com", 
+    "user": "alewisohn"
+  }, 
+  "preferred_hosts": {
+    "54.175.31.208": "54.175.31.208", 
+    "54.175.97.102": "54.175.97.102", 
+    "vpn.sitterfied.com": "vpn.sitterfied.com"
+  }, 
+  "recent": {
+    "54.175.31.208": "alewisohn", 
+    "54.175.97.102": "alewisohn", 
+    "vpn.sitterfied.com": "alewisohn"
+  }, 
+  "verbose_tooltip": true, 
+  "vpn_proto": "adaptive"
+}

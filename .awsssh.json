@@ -1,0 +1,78 @@
+{
+    "sitterfied-bastion": {
+        "keys": [
+            "AKIAILLMAF7PGRJVJ5VQ",
+            "0Tyv06W11Djkll+k29VZvTwtXfQA3D8xXTu3828u"
+        ],
+        "region": "us-east-1",
+        "filters": {
+            "tag:Name": "bastion-host"
+        },
+        "hostname_key": "ip_address",
+        "host_format": "sitterfied-bastion-{id}",
+        "configs": {
+            "ForwardAgent": "yes",
+            "User": "ec2-user",
+            "IdentityFile": "~/.ssh/sitterfied-web-2014-12-30.pem",
+            "UserKnownHostsFile": "/dev/null",
+            "StrictHostKeyChecking": "no"
+        }
+    },
+    "sitterfied-test": {
+        "keys": [
+            "AKIAILLMAF7PGRJVJ5VQ",
+            "0Tyv06W11Djkll+k29VZvTwtXfQA3D8xXTu3828u"
+        ],
+        "region": "us-east-1",
+        "filters": {
+            "tag:Name": "website-test-website-server"
+        },
+        "hostname_key": "private_ip_address",
+        "host_format": "sitterfied-test-{id}",
+        "configs": {
+            "ForwardAgent": "yes",
+            "User": "ubuntu",
+            "IdentityFile": "~/.ssh/sitterfied-web-2014-12-30.pem",
+            "UserKnownHostsFile": "/dev/null",
+            "StrictHostKeyChecking": "no"
+        }
+    },
+    "sitterfied-prod": {
+        "keys": [
+            "AKIAILLMAF7PGRJVJ5VQ",
+            "0Tyv06W11Djkll+k29VZvTwtXfQA3D8xXTu3828u"
+        ],
+        "region": "us-east-1",
+        "filters": {
+            "tag:Name": "website-prod-website-server"
+        },
+        "hostname_key": "private_ip_address",
+        "host_format": "sitterfied-prod-{id}",
+        "configs": {
+            "ForwardAgent": "yes",
+            "User": "ubuntu",
+            "IdentityFile": "~/.ssh/sitterfied-web-2014-12-30.pem",
+            "UserKnownHostsFile": "/dev/null",
+            "StrictHostKeyChecking": "no"
+        }
+    },
+    "sitterfied-vpn": {
+        "keys": [
+            "AKIAILLMAF7PGRJVJ5VQ",
+            "0Tyv06W11Djkll+k29VZvTwtXfQA3D8xXTu3828u"
+        ],
+        "region": "us-east-1",
+        "filters": {
+            "tag:Name": "vpn-server"
+        },
+        "hostname_key": "ip_address",
+        "host_format": "sitterfied-vpn-server",
+        "configs": {
+            "ForwardAgent": "yes",
+            "User": "openvpnas",
+            "IdentityFile": "~/.ssh/sitterfied-web-2014-12-30.pem",
+            "UserKnownHostsFile": "/dev/null",
+            "StrictHostKeyChecking": "no"
+        }
+    }
+}
