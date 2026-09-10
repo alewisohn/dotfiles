@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 #
 # dot
 #
@@ -38,20 +38,24 @@ while test $# -gt 0; do
 	shift
 done
 
-export ZSH=$HOME/.dotfiles
+export ZSH="$dotfilesDirectory"
 
 # Update dotfiles themselves
-echo "› git pull"
-git -C $ZSH pull
+if [ -n "$(git -C "$ZSH" status --porcelain --untracked-files=normal)" ]; then
+	echo "› Skipping git pull: dotfiles have uncommitted changes; continuing local setup"
+else
+	echo "› git pull"
+	git -C "$ZSH" pull --ff-only
+fi
 
 # Set macOS defaults
-$ZSH/macos/set-defaults.sh
+"$ZSH/macos/set-defaults.sh"
 
 # Set macOS hostname
-$ZSH/macos/set-hostname.sh
+"$ZSH/macos/set-hostname.sh"
 
 # Install homebrew
-$ZSH/homebrew/install.sh 2>&1
+"$ZSH/homebrew/install.sh" 2>&1
 
 # Upgrade homebrew
 echo "› brew update"
@@ -62,4 +66,4 @@ brew upgrade --no-ask
 
 # Install software
 echo "› script/install"
-$ZSH/script/install
+"$ZSH/script/install"

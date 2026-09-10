@@ -6,6 +6,7 @@ cd "$(dirname "$0")/.."
 DOTFILES_ROOT=$(pwd -P)
 
 set -e
+set -o pipefail
 
 echo ''
 
@@ -24,7 +25,7 @@ success () {
 fail () {
   printf "\r\033[2K  [\033[0;31mFAIL\033[0m] $1\n"
   echo ''
-  exit
+  exit 1
 }
 
 setup_gitconfig () {
@@ -55,6 +56,11 @@ link_file () {
 
   local overwrite= backup= skip=
   local action=
+
+  if [ -L "$dst" ] && [ "$(readlink "$dst")" == "$src" ]; then
+    success "skipped $src"
+    return
+  fi
 
   if [ -f "$dst" -o -d "$dst" -o -L "$dst" ]
   then
@@ -141,6 +147,12 @@ install_dotfiles () {
     link_file "$src" "$dst"
   done
 
+  # Karabiner watches its parent directory: linking individual files breaks reloads.
+  if [ -d "$DOTFILES_ROOT/config/karabiner" ]; then
+    mkdir -p "$HOME/.config"
+    link_file "$DOTFILES_ROOT/config/karabiner" "$HOME/.config/karabiner"
+  fi
+
   while IFS= read -r -d '' src
   do
     relative_path="${src#"$DOTFILES_ROOT/config/"}"
@@ -149,7 +161,9 @@ install_dotfiles () {
 
     mkdir -p "$(dirname "$dst")"
     link_file "$src" "$dst"
-  done < <(find -H "$DOTFILES_ROOT/config" -type f -not -path '*.git*' -print0)
+  done < <(find -H "$DOTFILES_ROOT/config" \
+    -path "$DOTFILES_ROOT/config/karabiner" -prune -o \
+    -type f -not -path '*.git*' -print0)
 }
 
 setup_gitconfig
@@ -159,7 +173,7 @@ install_dotfiles
 if [ "$(uname -s)" == "Darwin" ]
 then
   info "installing dependencies"
-  if source bin/dot | while read -r data; do info "$data"; done
+  if bash bin/dot | while read -r data; do info "$data"; done
   then
     success "dependencies installed"
   else
