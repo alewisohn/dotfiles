@@ -226,6 +226,11 @@ gaps.outer.right =      8
     alt-shift-up = ['join-with up', 'mode main']
     alt-shift-right = ['join-with right', 'mode main']
 
+    # Volume controls
+    down = 'volume down'
+    up = 'volume up'
+    shift-down = ['volume set 0', 'mode main']
+
 [[on-window-detected]]
 if.app-id = 'com.tinyspeck.slackmacgap'
 run = ['move-node-to-workspace 1']
