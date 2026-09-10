@@ -80,11 +80,20 @@ gaps.outer.bottom =     8
 gaps.outer.top =        8
 gaps.outer.right =      8
 
+# Workspace 1 follows the external display at home or either office.
+# Match by display name rather than macOS main/secondary designation.
+# Fall back to the laptop display when no external monitor is connected.
+[workspace-to-monitor-force-assignment]
+    1 = ['^(?!.*built-in).*$', 'built-in', 'main']
+
 # 'main' binding mode declaration
 # See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
 # 'main' binding mode must be always presented
 # Fallback value (if you omit the key): mode.main.binding = {}
 [mode.main.binding]
+
+    # Close the focused window
+    alt-w = 'close'
 
     # All possible keys:
     # - Letters.        a, b, c, ..., z
@@ -113,8 +122,6 @@ gaps.outer.right =      8
     '''
 
     # See: https://nikitabobko.github.io/AeroSpace/commands#layout
-    #alt-slash = 'layout tiles horizontal vertical'
-    #alt-comma = 'layout accordion horizontal vertical'
     alt-j = 'layout horizontal vertical'
     alt-l = 'layout accordion tiles'
     alt-o = 'layout tiling floating'
@@ -198,7 +205,10 @@ gaps.outer.right =      8
     alt-shift-e = 'exec-and-forget open -na "Visual Studio Code"'
 
     # Open Password Manager (1Password)
-    alt-shift-backslash = 'exec-and-forget open -a "1Password"'
+    alt-shift-slash = 'exec-and-forget open -a "1Password"'
+
+    # Open ChatGPT
+    alt-shift-a = 'exec-and-forget open -a "ChatGPT"'
 
 # 'service' binding mode declaration.
 # See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
@@ -215,3 +225,23 @@ gaps.outer.right =      8
     alt-shift-down = ['join-with down', 'mode main']
     alt-shift-up = ['join-with up', 'mode main']
     alt-shift-right = ['join-with right', 'mode main']
+
+[[on-window-detected]]
+if.app-id = 'com.tinyspeck.slackmacgap'
+run = ['move-node-to-workspace 1']
+
+[[on-window-detected]]
+if.app-id = 'app.zen-browser.zen'
+run = ['move-node-to-workspace 1']
+
+[[on-window-detected]]
+if.app-id = 'com.microsoft.VSCode'
+run = ['move-node-to-workspace 2']
+
+[[on-window-detected]]
+if.app-id = 'com.openai.codex'
+run = ['move-node-to-workspace 5']
+
+[[on-window-detected]]
+if.app-id = 'com.apple.MobileSMS'
+run = ['move-node-to-workspace 6']

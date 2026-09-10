@@ -40,3 +40,11 @@
 	defaultBranch = main
 [pull]
 	rebase = true
+[gpg]
+	format = ssh
+[gpg "ssh"]
+	program = /Applications/1Password.app/Contents/MacOS/op-ssh-sign
+[commit]
+	gpgsign = true
+[user]
+	signingkey = ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCc9FaBc34HacSSCFZZ0X8zttuSOAKMq40G0nF3gVcVR1PdzVM0sr6k13NX46KdAV0zkHcyG/HKUjSkCFb32YZU58Cs6B/WJqDLFmQkGggLUR0Xo6NmHVaazTcEYPkN6/1iT+3Oo0vr8H2CL2b5QyI2Rz5KdaaszcfZmzyYPS1hLWMvXYatM+qvOL832w6lLEbkOKHm2UEIvWlKwY34fDobOPkbA25l1UFG5S66f8Cgm0og229FlTGY/sMPrI3tUfJADltGa6pazM88cFs+MxhT0XWUGCZpNv7GaRFxo5Eve1g5y/eDkJrwmLev4oQeckxTDWxrowKN4bKPyT3/jJ53
