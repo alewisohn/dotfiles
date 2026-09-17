@@ -12,9 +12,30 @@ then
   source ~/.localrc
 fi
 
+source "$ZSH/shell/keys.sh"
+
+# Select platform-specific configuration. Override DOTFILES_PROFILE in
+# ~/.localrc when testing a profile or adding another supported system.
+if [[ -z ${DOTFILES_PROFILE:-} ]]
+then
+  case "$OSTYPE" in
+    darwin*) DOTFILES_PROFILE=macos ;;
+    linux*)  DOTFILES_PROFILE=omarchy ;;
+    *)       DOTFILES_PROFILE=unknown ;;
+  esac
+fi
+export DOTFILES_PROFILE
+
 # all of our zsh files
 typeset -U config_files
 config_files=($ZSH/**/*.zsh)
+
+# Never load another operating system's shell configuration.
+config_files=(${config_files:#$ZSH/platform/*})
+if [[ -d "$ZSH/platform/$DOTFILES_PROFILE/shell" ]]
+then
+  config_files+=("$ZSH/platform/$DOTFILES_PROFILE/shell"/**/*.zsh(N))
+fi
 
 # load the path files
 for file in ${(M)config_files:#*/path.zsh}

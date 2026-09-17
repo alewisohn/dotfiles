@@ -8,6 +8,25 @@ DOTFILES_ROOT=$(pwd -P)
 set -e
 set -o pipefail
 
+install_dependencies=true
+while [ "$#" -gt 0 ]
+do
+  case "$1" in
+    --skip-packages)
+      install_dependencies=false
+      ;;
+    -h|--help)
+      echo "usage: script/bootstrap [--skip-packages]"
+      exit 0
+      ;;
+    *)
+      echo "unknown option: $1" >&2
+      exit 1
+      ;;
+  esac
+  shift
+done
+
 echo ''
 
 info () {
@@ -27,6 +46,26 @@ fail () {
   echo ''
   exit 1
 }
+
+detect_profile () {
+  if [ -n "${DOTFILES_PROFILE:-}" ]; then
+    printf '%s\n' "$DOTFILES_PROFILE"
+    return
+  fi
+
+  case "$(uname -s)" in
+    Darwin) printf '%s\n' 'macos' ;;
+    Linux)  printf '%s\n' 'omarchy' ;;
+    *)      fail "unsupported operating system: $(uname -s)" ;;
+  esac
+}
+
+DOTFILES_PROFILE=$(detect_profile)
+export DOTFILES_PROFILE
+
+if [ ! -d "$DOTFILES_ROOT/platform/$DOTFILES_PROFILE" ]; then
+  fail "unknown dotfiles profile: $DOTFILES_PROFILE"
+fi
 
 setup_gitconfig () {
   if ! [ -f git/gitconfig.local.symlink ]
@@ -132,46 +171,81 @@ link_file () {
 }
 
 install_dotfiles () {
-  info 'installing dotfiles'
+  info "installing dotfiles for $DOTFILES_PROFILE"
 
   local overwrite_all=false backup_all=false skip_all=false
 
-  for src in $(find -H "$DOTFILES_ROOT" -maxdepth 2 -name '*.symlink' -not -path '*.git*')
-  do
-    if [[ "$src" == "$DOTFILES_ROOT/config/"* ]]
-    then
-      continue
-    fi
-
-    dst="$HOME/.$(basename "${src%.*}")"
-    link_file "$src" "$dst"
-  done
-
-  # Karabiner watches its parent directory: linking individual files breaks reloads.
-  if [ -d "$DOTFILES_ROOT/config/karabiner" ]; then
-    mkdir -p "$HOME/.config"
-    link_file "$DOTFILES_ROOT/config/karabiner" "$HOME/.config/karabiner"
+  # The zsh entry point moved from the shared tree into the macOS profile.
+  if [ -L "$HOME/.zshrc" ] && \
+    [ "$(readlink "$HOME/.zshrc")" = "$DOTFILES_ROOT/zsh/zshrc.symlink" ]; then
+    rm "$HOME/.zshrc"
+    success "removed legacy link $HOME/.zshrc"
   fi
+
+  # Remove links created by the previous, non-profile-aware layout. Only links
+  # that still point at the exact legacy locations are touched.
+  local legacy_relative legacy_src legacy_dst
+  for legacy_relative in \
+    aerospace/aerospace.toml.symlink \
+    borders/bordersrc.symlink \
+    karabiner
+  do
+    legacy_src="$DOTFILES_ROOT/config/$legacy_relative"
+    legacy_dst="$HOME/.config/${legacy_relative%.symlink}"
+    if [ -L "$legacy_dst" ] && [ "$(readlink "$legacy_dst")" = "$legacy_src" ]; then
+      rm "$legacy_dst"
+      success "removed legacy link $legacy_dst"
+    fi
+  done
 
   while IFS= read -r -d '' src
   do
-    relative_path="${src#"$DOTFILES_ROOT/config/"}"
-    relative_path="${relative_path%.symlink}"
-    dst="$HOME/.config/$relative_path"
-
-    mkdir -p "$(dirname "$dst")"
+    dst="$HOME/.$(basename "${src%.*}")"
     link_file "$src" "$dst"
-  done < <(find -H "$DOTFILES_ROOT/config" \
-    -path "$DOTFILES_ROOT/config/karabiner" -prune -o \
-    -type f -not -path '*.git*' -print0)
+  done < <(find -H "$DOTFILES_ROOT" -maxdepth 2 -name '*.symlink' -not -path '*.git*' -print0)
+
+  local platform_home="$DOTFILES_ROOT/platform/$DOTFILES_PROFILE/home"
+  if [ -d "$platform_home" ]; then
+    while IFS= read -r -d '' src
+    do
+      dst="$HOME/.$(basename "${src%.*}")"
+      link_file "$src" "$dst"
+    done < <(find -H "$platform_home" -type f -name '*.symlink' -print0)
+  fi
+
+  local config_root relative_path
+  for config_root in \
+    "$DOTFILES_ROOT/config" \
+    "$DOTFILES_ROOT/platform/$DOTFILES_PROFILE/config"
+  do
+    [ -d "$config_root" ] || continue
+
+    # Karabiner watches its parent directory, so link that directory as a unit.
+    if [ -d "$config_root/karabiner" ]; then
+      mkdir -p "$HOME/.config"
+      link_file "$config_root/karabiner" "$HOME/.config/karabiner"
+    fi
+
+    while IFS= read -r -d '' src
+    do
+      relative_path="${src#"$config_root/"}"
+      relative_path="${relative_path%.symlink}"
+      dst="$HOME/.config/$relative_path"
+
+      mkdir -p "$(dirname "$dst")"
+      link_file "$src" "$dst"
+    done < <(find -H "$config_root" \
+      -path "$config_root/karabiner" -prune -o \
+      -type f -not -path '*.git*' -print0)
+  done
 }
 
 setup_gitconfig
 install_dotfiles
 
-# If we're on a Mac, let's install and setup homebrew.
-if [ "$(uname -s)" == "Darwin" ]
-then
+# Install dependencies using the selected platform profile unless the caller
+# only wants to refresh symlinks.
+if [ "$install_dependencies" = true ]; then
   info "installing dependencies"
   if bash bin/dot | while read -r data; do info "$data"; done
   then

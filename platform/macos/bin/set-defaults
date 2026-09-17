@@ -1,0 +1,5 @@
+#!/bin/sh
+#
+# Sets macOS defaults from the active macOS profile.
+
+exec "$ZSH/platform/macos/system/set-defaults.sh"

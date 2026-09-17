@@ -1,1 +1,4 @@
-export PATH="/Users/holman/.codeium/windsurf/bin:$PATH"
+if [[ -d "$HOME/.codeium/windsurf/bin" ]]
+then
+  export PATH="$HOME/.codeium/windsurf/bin:$PATH"
+fi

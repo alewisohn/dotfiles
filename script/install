@@ -4,10 +4,27 @@
 
 set -e
 
-cd "$(dirname $0)"/..
+cd "$(dirname "$0")"/..
+DOTFILES_ROOT=$(pwd -P)
 
-echo "› brew bundle"
-brew bundle
+if [ -z "${DOTFILES_PROFILE:-}" ]; then
+  case "$(uname -s)" in
+    Darwin) DOTFILES_PROFILE=macos ;;
+    Linux) DOTFILES_PROFILE=omarchy ;;
+    *) echo "Unsupported operating system: $(uname -s)"; exit 1 ;;
+  esac
+fi
 
-# find the installers and run them iteratively
-find . -name install.sh | while read installer ; do sh -c "${installer}" ; done
+case "$DOTFILES_PROFILE" in
+  macos)
+    echo "› brew bundle"
+    brew bundle --file="$DOTFILES_ROOT/platform/macos/Brewfile"
+    ;;
+  omarchy)
+    "$DOTFILES_ROOT/platform/omarchy/install.sh"
+    ;;
+  *)
+    echo "Unknown dotfiles profile: $DOTFILES_PROFILE"
+    exit 1
+    ;;
+esac

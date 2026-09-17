@@ -30,10 +30,10 @@ class Object
 end
 
 # Copies the result of the last operation you ran in IRB to the system
-# clipboard (if you're on macOS).
+# clipboard using the platform-aware helper in bin/.
 def cop
   last_value = IRB.CurrentContext.last_value
-  %x[echo '#{last_value}' | pbcopy]
+  IO.popen('clipboard-copy', 'w') { |clipboard| clipboard.write(last_value.inspect) }
   "copied \`#{last_value}' to your clipboard"
 end
 

@@ -40,6 +40,15 @@ done
 
 export ZSH="$dotfilesDirectory"
 
+if [ -z "${DOTFILES_PROFILE:-}" ]; then
+	case "$(uname -s)" in
+		Darwin) DOTFILES_PROFILE=macos ;;
+		Linux) DOTFILES_PROFILE=omarchy ;;
+		*) echo "Unsupported operating system: $(uname -s)"; exit 1 ;;
+	esac
+fi
+export DOTFILES_PROFILE
+
 # Update dotfiles themselves
 if [ -n "$(git -C "$ZSH" status --porcelain --untracked-files=normal)" ]; then
 	echo "› Skipping git pull: dotfiles have uncommitted changes; continuing local setup"
@@ -48,21 +57,28 @@ else
 	git -C "$ZSH" pull --ff-only
 fi
 
-# Set macOS defaults
-"$ZSH/macos/set-defaults.sh"
+case "$DOTFILES_PROFILE" in
+	macos)
+		# Apply macOS preferences and keep Homebrew current.
+		"$ZSH/platform/macos/system/set-defaults.sh"
+		"$ZSH/platform/macos/system/set-hostname.sh"
+		"$ZSH/platform/macos/homebrew/install.sh" 2>&1
 
-# Set macOS hostname
-"$ZSH/macos/set-hostname.sh"
+		echo "› brew update"
+		brew update
 
-# Install homebrew
-"$ZSH/homebrew/install.sh" 2>&1
-
-# Upgrade homebrew
-echo "› brew update"
-brew update
-
-echo "› brew upgrade"
-brew upgrade --no-ask
+		echo "› brew upgrade"
+		brew upgrade --no-ask
+		;;
+	omarchy)
+		# Omarchy owns the base operating-system setup. Package installation is
+		# intentionally handled by the narrower platform installer below.
+		;;
+	*)
+		echo "Unknown dotfiles profile: $DOTFILES_PROFILE"
+		exit 1
+		;;
+esac
 
 # Install software
 echo "› script/install"

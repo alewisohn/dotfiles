@@ -1,0 +1,9 @@
+# Shared command-line tools not guaranteed by the base Omarchy installation.
+atuin
+btop
+imagemagick
+starship
+tmux
+tree
+wget
+wl-clipboard
