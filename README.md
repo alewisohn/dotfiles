@@ -1,87 +1,110 @@
-# holman does dotfiles
+# Dotfiles
 
-Your dotfiles are how you personalize your system. These are mine.
+My personal development environment for two systems: a macOS work laptop and
+an Omarchy personal computer. The repository keeps shared preferences in one
+place while isolating operating-system-specific packages, shell configuration,
+commands, and application settings.
 
-I was a little tired of having long alias files and everything strewn about
-(which is extremely common on other dotfiles projects, too). That led to this
-project being much more topic-centric. I realized I could split a lot of things
-up into the main areas I used (Ruby, git, system libraries, and so on), so I
-structured the project accordingly.
+This is an opinionated personal setup, not a general-purpose dotfiles
+distribution. It assumes the tools, directory layout, and workflows I use.
 
-If you're interested in the philosophy behind why projects like these are
-awesome, you might want to [read my post on the
-subject](http://zachholman.com/2010/08/dotfiles-are-meant-to-be-forked/).
+## Supported systems
 
-## topical
+| Profile | System | Shell | Package manager |
+| --- | --- | --- | --- |
+| `macos` | macOS | Zsh | Homebrew |
+| `omarchy` | Omarchy/Arch Linux | Bash | pacman |
 
-Everything's built around topic areas. If you're adding a new area to your
-forked dotfiles — say, "Java" — you can simply add a `java` directory and put
-files in there. Anything with an extension of `.zsh` will get automatically
-included into your shell. Anything with an extension of `.symlink` will get
-symlinked without extension into `$HOME` when you run `script/bootstrap`.
+The profile is detected from `uname`. Set `DOTFILES_PROFILE` in `~/.localrc`
+to override it explicitly.
 
-## what's inside
+## Repository layout
 
-A lot of stuff. Seriously, a lot of stuff. Check them out in the file browser
-above and see what components may mesh up with you.
-[Fork it](https://github.com/holman/dotfiles/fork), remove what you don't
-use, and build on what you do use.
+```text
+bin/                Shared commands available on PATH
+config/             Shared files linked beneath ~/.config
+functions/          Shared Zsh functions
+git/                Shared Git configuration and aliases
+shell/              Portable shell fragments
+platform/macos/     All macOS-only configuration and tooling
+platform/omarchy/   All Omarchy-only configuration and tooling
+script/             Bootstrap and package-install entry points
+```
 
-## components
+The macOS profile contains its Brewfile, Zsh entry point, Homebrew setup,
+system defaults, platform commands, and AeroSpace, Borders, and Karabiner
+configuration. See `platform/macos/README.md` for its structure.
 
-There's a few special files in the hierarchy.
+The Omarchy profile contains its Bash entry point and pacman package list. Its
+`.bashrc` preserves Omarchy's managed Bash layer before loading my overrides.
+See `platform/omarchy/README.md` for details.
 
-- **bin/**: Anything in `bin/` will get added to your `$PATH` and be made
-  available everywhere.
-- **topic/\*.zsh**: Any files ending in `.zsh` get loaded into your
-  environment.
-- **topic/path.zsh**: Any file named `path.zsh` is loaded first and is
-  expected to setup `$PATH` or similar.
-- **topic/completion.zsh**: Any file named `completion.zsh` is loaded
-  last and is expected to setup autocomplete.
-- **topic/install.sh**: Any file named `install.sh` is executed when you run `script/install`. To avoid being loaded automatically, its extension is `.sh`, not `.zsh`.
-- **topic/\*.symlink**: Any file ending in `*.symlink` gets symlinked into
-  your `$HOME`. This is so you can keep all of those versioned in your dotfiles
-  but still keep those autoloaded files in your home directory. These get
-  symlinked in when you run `script/bootstrap`.
-
-## install
-
-Run this:
+## Installation
 
 ```sh
-git clone https://github.com/holman/dotfiles.git ~/.dotfiles
+git clone git@github.com:alewisohn/dotfiles.git ~/.dotfiles
 cd ~/.dotfiles
 script/bootstrap
 ```
 
-This will symlink the appropriate files in `.dotfiles` to your home directory.
-Everything is configured and tweaked within `~/.dotfiles`.
+Bootstrap detects the active profile, creates the appropriate symlinks, and
+installs that platform's dependencies. Existing files are never silently
+replaced: the script asks whether to skip, overwrite, or back them up.
 
-The main file you'll want to change right off the bat is `zsh/zshrc.symlink`,
-which sets up a few paths that'll be different on your particular machine.
+To create or refresh symlinks without installing packages:
 
-`dot` is a simple script that installs some dependencies, sets sane macOS
-defaults, and so on. Tweak this script, and occasionally run `dot` from
-time to time to keep your environment fresh and up-to-date. You can find
-this script in `bin/`.
+```sh
+script/bootstrap --skip-packages
+```
 
-## bugs
+Run the maintenance command periodically to update the repository and install
+or upgrade dependencies for the active profile:
 
-I want this to work for everyone; that means when you clone it down it should
-work for you even though you may not have `rbenv` installed, for example. That
-said, I do use this as _my_ dotfiles, so there's a good chance I may break
-something if I forget to make a check for a dependency.
+```sh
+dot
+```
 
-If you're brand-new to the project and run into any blockers, please
-[open an issue](https://github.com/holman/dotfiles/issues) on this repository
-and I'd love to get it fixed for you!
+On macOS, `dot` also applies system defaults and updates Homebrew. On Omarchy,
+it installs missing packages listed in `platform/omarchy/packages.txt` without
+replacing Omarchy's base configuration.
 
-## thanks
+## How files are loaded
 
-I forked [Ryan Bates](http://github.com/ryanb)' excellent
-[dotfiles](http://github.com/ryanb/dotfiles) for a couple years before the
-weight of my changes and tweaks inspired me to finally roll my own. But Ryan's
-dotfiles were an easy way to get into bash customization, and then to jump ship
-to zsh a bit later. A decent amount of the code in these dotfiles stem or are
-inspired from Ryan's original project.
+- Shared files under `config/` retain their relative paths beneath
+  `~/.config`.
+- Files under `platform/<profile>/config/` are linked the same way, but only
+  for the active profile.
+- Files ending in `.symlink` under a topic or `platform/<profile>/home/` are
+  linked into the home directory with the suffix removed.
+- macOS loads shared Zsh files plus `platform/macos/shell/**/*.zsh`. Files named
+  `path.zsh` load first and `completion.zsh` files load last.
+- Omarchy uses `platform/omarchy/home/bashrc.symlink`, which sources Omarchy's
+  managed `default/bash/rc` and then a deliberate set of Bash-compatible shared
+  aliases and functions.
+- Shared commands should be portable. When behavior differs by platform, they
+  dispatch through helpers such as `bin/clipboard-copy`.
+
+## Machine-local configuration
+
+Secrets, employer-specific values, and machine-only overrides belong in
+`~/.localrc`, which is sourced by both shell profiles and is not tracked.
+
+Git identity and credentials live in the generated, untracked
+`git/gitconfig.local.symlink`. Platform-specific Git behavior is kept in each
+profile's `home/gitconfig.platform.symlink`.
+
+## Adding configuration
+
+- Put configuration shared by both systems at the repository root or under
+  `config/`.
+- Put macOS-only files under `platform/macos/`.
+- Put Omarchy-only files under `platform/omarchy/`.
+- Avoid symlinking entire directories managed by Omarchy; add only intentional
+  overrides so Omarchy upgrades can continue to manage their defaults.
+
+## Origins
+
+This repository originally grew from Zach Holman's dotfiles, but it has since
+been substantially reorganized around my own macOS and Omarchy environments.
+The topic-oriented convention remains an influence; the configuration and
+platform architecture here are personalized for my systems.

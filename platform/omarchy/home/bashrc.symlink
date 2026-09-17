@@ -1,0 +1,59 @@
+# Keep Omarchy's managed Bash environment as the base layer. New package-based
+# installations use /usr/share; older development installs live under ~/.local.
+omarchy_root="${OMARCHY_PATH:-/usr/share/omarchy}"
+if [[ -r "$omarchy_root/default/bash/rc" ]]; then
+  source "$omarchy_root/default/bash/rc"
+elif [[ -r "$HOME/.local/share/omarchy/default/bash/rc" ]]; then
+  source "$HOME/.local/share/omarchy/default/bash/rc"
+fi
+unset omarchy_root
+
+# Some Omarchy startup paths source ~/.bashrc more than once.
+[[ -n ${DOTFILES_BASHRC_LOADED:-} ]] && return
+export DOTFILES_BASHRC_LOADED=1
+
+export DOTFILES_PROFILE=omarchy
+export DOTFILES_ROOT="$HOME/.dotfiles"
+export ZSH="$DOTFILES_ROOT" # Kept for compatibility with existing scripts.
+export PROJECTS="$HOME/Code"
+export PATH="$DOTFILES_ROOT/platform/omarchy/bin:$DOTFILES_ROOT/bin:$HOME/.local/bin:$PATH"
+
+# Machine-only values and secrets stay outside the repository.
+if [[ -r "$HOME/.localrc" ]]; then
+  source "$HOME/.localrc"
+fi
+
+# These files intentionally contain syntax shared by Bash and Zsh.
+dotfiles_shell_files=(
+  "$DOTFILES_ROOT/editors/env.zsh"
+  "$DOTFILES_ROOT/editors/windsurf.zsh"
+  "$DOTFILES_ROOT/docker/aliases.zsh"
+  "$DOTFILES_ROOT/git/aliases.zsh"
+  "$DOTFILES_ROOT/ruby/aliases.zsh"
+  "$DOTFILES_ROOT/shell/keys.sh"
+  "$DOTFILES_ROOT/zsh/aliases.zsh"
+  "$DOTFILES_ROOT/yarn/path.zsh"
+  "$DOTFILES_ROOT/functions/gf"
+  "$DOTFILES_ROOT/functions/extract"
+)
+
+for file in "${dotfiles_shell_files[@]}"; do
+  [[ -r "$file" ]] && source "$file"
+done
+unset file dotfiles_shell_files
+
+c() {
+  cd "$PROJECTS/$1" || return
+}
+
+if command -v rbenv >/dev/null 2>&1; then
+  eval "$(rbenv init - bash)"
+fi
+
+if command -v atuin >/dev/null 2>&1 && [[ -z ${ATUIN_SESSION:-} ]]; then
+  eval "$(atuin init bash)"
+fi
+
+if command -v thefuck >/dev/null 2>&1; then
+  eval "$(thefuck --alias)"
+fi
