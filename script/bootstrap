@@ -107,37 +107,32 @@ link_file () {
     if [ "$overwrite_all" == "false" ] && [ "$backup_all" == "false" ] && [ "$skip_all" == "false" ]
     then
 
-      local currentSrc="$(readlink $dst)"
-
-      if [ "$currentSrc" == "$src" ]
-      then
-
-        skip=true;
-
-      else
-
+      while true
+      do
         user "File already exists: $dst ($(basename "$src")), what do you want to do?\n\
         [s]kip, [S]kip all, [o]verwrite, [O]verwrite all, [b]ackup, [B]ackup all?"
-        read -n 1 action
+        if ! read -r -n 1 action; then
+          fail "could not read a choice for $dst"
+        fi
+        echo ''
 
         case "$action" in
           o )
-            overwrite=true;;
+            overwrite=true; break;;
           O )
-            overwrite_all=true;;
+            overwrite_all=true; break;;
           b )
-            backup=true;;
+            backup=true; break;;
           B )
-            backup_all=true;;
+            backup_all=true; break;;
           s )
-            skip=true;;
+            skip=true; break;;
           S )
-            skip_all=true;;
+            skip_all=true; break;;
           * )
-            ;;
+            user 'Please choose s, S, o, O, b, or B.';;
         esac
-
-      fi
+      done
 
     fi
 
@@ -198,19 +193,20 @@ install_dotfiles () {
     fi
   done
 
-  while IFS= read -r -d '' src
+  # Keep file discovery on a separate descriptor so prompts read user input.
+  while IFS= read -r -d '' -u 3 src
   do
     dst="$HOME/.$(basename "${src%.*}")"
     link_file "$src" "$dst"
-  done < <(find -H "$DOTFILES_ROOT" -maxdepth 2 -name '*.symlink' -not -path '*.git*' -print0)
+  done 3< <(find -H "$DOTFILES_ROOT" -maxdepth 2 -name '*.symlink' -not -path '*.git*' -print0)
 
   local platform_home="$DOTFILES_ROOT/platform/$DOTFILES_PROFILE/home"
   if [ -d "$platform_home" ]; then
-    while IFS= read -r -d '' src
+    while IFS= read -r -d '' -u 3 src
     do
       dst="$HOME/.$(basename "${src%.*}")"
       link_file "$src" "$dst"
-    done < <(find -H "$platform_home" -type f -name '*.symlink' -print0)
+    done 3< <(find -H "$platform_home" -type f -name '*.symlink' -print0)
   fi
 
   local config_root relative_path
@@ -226,7 +222,7 @@ install_dotfiles () {
       link_file "$config_root/karabiner" "$HOME/.config/karabiner"
     fi
 
-    while IFS= read -r -d '' src
+    while IFS= read -r -d '' -u 3 src
     do
       relative_path="${src#"$config_root/"}"
       relative_path="${relative_path%.symlink}"
@@ -234,7 +230,7 @@ install_dotfiles () {
 
       mkdir -p "$(dirname "$dst")"
       link_file "$src" "$dst"
-    done < <(find -H "$config_root" \
+    done 3< <(find -H "$config_root" \
       -path "$config_root/karabiner" -prune -o \
       -type f -not -path '*.git*' -print0)
   done
