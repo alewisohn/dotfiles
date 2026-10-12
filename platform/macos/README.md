@@ -14,3 +14,9 @@ Everything specific to macOS lives in this directory:
 Shared commands and configuration remain at the repository root. Shared code
 must either be portable or dispatch through a platform-aware helper such as
 `bin/clipboard-copy`.
+
+Safari preference writes may be blocked by macOS privacy permissions. If this
+happens, setup prints a warning and continues with the remaining settings.
+Adjust Safari settings manually, or grant the app running the script (for
+example, Ghostty or VS Code) Full Disk Access under System Settings → Privacy &
+Security, restart that app, and rerun `set-defaults`.
