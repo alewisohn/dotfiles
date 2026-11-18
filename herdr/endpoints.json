@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "ssh": [
+    {
+      "id": "f6dc196e9d86d5faf49b07eaae64ee96",
+      "label": "Hermes",
+      "target": "hermes",
+      "session": "default",
+      "enabled": true
+    },
+    {
+      "id": "257d36b9ed7102172f3ad09b5d23fc76",
+      "label": "Proxmox",
+      "target": "proxmox",
+      "session": "default",
+      "enabled": true
+    }
+  ]
+}

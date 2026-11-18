@@ -82,6 +82,20 @@
                             "to": [{ "key_code": "left_shift" }]
                         }
                     ]
+                },
+                {
+                    "identifiers": {
+                        "is_pointing_device": true,
+                        "product_id": 45108,
+                        "vendor_id": 1133
+                    },
+                    "ignore": false,
+                    "simple_modifications": [
+                        {
+                            "from": { "pointing_button": "button5" },
+                            "to": [{ "key_code": "left_shift" }]
+                        }
+                    ]
                 }
             ],
             "name": "Default profile",

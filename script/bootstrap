@@ -236,8 +236,27 @@ install_dotfiles () {
   done
 }
 
+# Herdr owns its saved-machine catalog and may rewrite it, so seed it once
+# instead of symlinking.
+seed_herdr_endpoints () {
+  local src="$DOTFILES_ROOT/herdr/endpoints.json"
+  local dst="$HOME/.local/state/herdr/client/endpoints.json"
+
+  [ -f "$src" ] || return 0
+  if [ -e "$dst" ]
+  then
+    info "herdr endpoints already present, leaving $dst alone"
+    return 0
+  fi
+
+  mkdir -p "$(dirname "$dst")"
+  install -m 600 "$src" "$dst"
+  success "seeded herdr endpoints at $dst"
+}
+
 setup_gitconfig
 install_dotfiles
+seed_herdr_endpoints
 
 # Install dependencies using the selected platform profile unless the caller
 # only wants to refresh symlinks.
